@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { CoursesService } from './courses.service.js';
+import { CoursesService, CourseValidationPipe } from './courses.service.js';
 import { CreateCourseDto } from './dto/create-course.dto.js';
 
 @Controller('courses')
@@ -16,8 +16,8 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get()
-  findAll(@Query('level') level?: string) {
-    return this.coursesService.findAll(level);
+  findAll(@Query('name') name?: string) {
+    return this.coursesService.findAll(name);
   }
 
   @Get(':id')
@@ -26,14 +26,14 @@ export class CoursesController {
   }
 
   @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
+  create(@Body(new CourseValidationPipe()) createCourseDto: CreateCourseDto) {
   return this.coursesService.create(createCourseDto);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() body: { title?: string; level?: string },
+    @Body(new CourseValidationPipe()) body: { name?: string; email?: string; age?: string; carrer?: string; semester?: string; isactive?: string },
   ) {
     return this.coursesService.update(Number(id), body);
   }
