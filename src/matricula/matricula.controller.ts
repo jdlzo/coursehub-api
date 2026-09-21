@@ -2,7 +2,7 @@ import { Body, Controller,Delete, Get, Param, Patch, Post, Query  } from '@nestj
 import {CreateMatriculaDto} from './dto/create-matricula.dto.js';
 import { MatriculaService, MatriculaValidationPipe } from './matricula.service.js';
 
-
+//hola
 @Controller('matricula')
 export class MatriculaController {
 
