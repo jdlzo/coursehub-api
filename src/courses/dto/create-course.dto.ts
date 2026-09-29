@@ -1,28 +1,16 @@
 import { IsIn, IsNotEmpty, IsString} from 'class-validator'; 
 
 export class CreateCourseDto { 
-  @IsString() 
-  @IsNotEmpty() 
-  name: string;
-
-  @IsString() 
-  @IsNotEmpty() 
-  age: string;
   
-  @IsString() 
-  @IsNotEmpty() 
-  carrer: string;
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-  @IsString() 
-  @IsNotEmpty() 
-  email: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['beginner', 'intermediate', 'advanced'])
+  level: string;
+
   
-  @IsString() 
-  @IsNotEmpty() 
-  isactive: string;
-    
-
-  @IsIn(['1','2','3','4','5','6','7','8','9','10']) 
-  semester: string;
 
 }

@@ -16,13 +16,13 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get()
-  findAll(@Query('name') name?: string) {
-    return this.coursesService.findAll(name);
+  findAll(@Query('id') id?: string) {
+    return this.coursesService.findAll(id);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.coursesService.findOne(Number(id));
+    return this.coursesService.findOne(id);
   }
 
   @Post()
@@ -33,13 +33,13 @@ export class CoursesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body(new CourseValidationPipe()) body: { name?: string; email?: string; age?: string; carrer?: string; semester?: string; isactive?: string },
+    @Body(new CourseValidationPipe()) body: CreateCourseDto,
   ) {
-    return this.coursesService.update(Number(id), body);
+    return this.coursesService.update(id, body);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.coursesService.remove(Number(id));
+    return this.coursesService.remove(id);
   }
 }

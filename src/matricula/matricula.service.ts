@@ -18,8 +18,8 @@ type UpdateMatriculaInput = {
 };
 @Injectable()
 export class MatriculaValidationPipe implements PipeTransform {
-    transform(value: any, metadata: ArgumentMetadata) {
-        if (value.studentID) {
+    transform(value: any) {
+        if (typeof value.studentID === 'string') {
             value.studentID = value.studentID.toLowerCase();
         }
         return value;   
@@ -30,9 +30,9 @@ export class MatriculaValidationPipe implements PipeTransform {
 export class MatriculaService {
     private nextId = 4;
     private matricula: matricula[] = [
-    { id: 1, studentID: '1', courseID: '1', isactive: 'Activo'},
-    { id: 2, studentID: '2', courseID: '2', isactive: 'Activo'},
-    { id: 3, studentID: '3', courseID: '3', isactive: 'Inactivo'},
+    { id: 1, studentID: 'oda2', courseID: '1', isactive: 'Activo'},
+    { id: 2, studentID: 'kasie5', courseID: '2', isactive: 'Activo'},
+    { id: 3, studentID: 'oas4', courseID: '3', isactive: 'Inactivo'},
   ];
 findAll(studentID?: string): matricula[] {
     if (!studentID) {

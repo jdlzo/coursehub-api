@@ -1,40 +1,16 @@
-import { Injectable,ConflictException,PipeTransform,ArgumentMetadata} from '@nestjs/common';
+import { Injectable,ConflictException,PipeTransform,ArgumentMetadata, NotFoundException} from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Course } from './entities/course.entity.js';
+import { DeepPartial, Repository } from 'typeorm';
 
-type Course = {
-  id: number;
-  name: string;
-  email: string;
-  age: string;
-  carrer: string;
-  semester: string;
-  isactive: string;
-};
-
-type CreateCourseInput = {
-  name: string;
-  email: string;
-  age: string;
-  carrer: string;
-  semester: string;
-  isactive: string;
-};
-
-type UpdateCourseInput = {
-  name?: string;
-  email?: string;
-  age?: string;
-  carrer?: string;
-  semester?: string;
-  isactive?: string;
-};
 
 //solo hace que el nombre se convierta en minuscula
 @Injectable()
 export class CourseValidationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
-    if (value.name) {
-      value.name = value.name.toLowerCase();
+    if (value.title) {
+      value.title = value.title.toLowerCase();
     }
     return value;
   }
@@ -42,60 +18,35 @@ export class CourseValidationPipe implements PipeTransform {
 
 @Injectable()
 export class CoursesService {
-  private nextId = 4;
-  private courses: Course[] = [
-    { id: 1, name: 'Jordan', email: 'AA@hotmail.com', age:'19',carrer:'Software',semester:'5',isactive:'Activo'},
-    { id: 2, name: 'Pepe', email: 'BBB@hotmail.com',age:'20',carrer:'Software',semester:'5',isactive:'Inactivo' },
-    { id: 3, name: 'Juan', email: 'AAA@hotmail.com',age:'45',carrer:'Software',semester:'5',isactive:'Activo' },
-  ];
+  constructor(
+    @InjectRepository(Course)
+    private readonly coursesRepository: Repository<Course>,
+  ) {} // 1
 
-
-  findAll(name?: string): Course[] {
-    if (!name) {
-      return this.courses;
-    }
-
-    return this.courses.filter((course) => course.name === name);
+  findAll(level?: string) { // 2
+    return this.coursesRepository.find({ where: level ? { level } : {} }); // 3
   }
 
-
-  findOne(id: number): Course | undefined {
-    return this.courses.find((course) => course.id === id);
-  }
-
-  create(createCourseDto: CreateCourseDto): Course {
-    const emailExists = this.courses.some(course => course.email === createCourseDto.email);
-    if (emailExists) {
-      throw new ConflictException('El correo ingresado ya esta en uso....');
-    }
-    const course = { id: this.nextId++, ...createCourseDto };
-    this.courses.push(course);
+  async findOne(id: string): Promise<Course> {
+    const course = await this.coursesRepository.findOneBy({ id: Number(id) }); // 4
+    if (!course) throw new NotFoundException(`Course ${id} not found`); // 5
     return course;
   }
 
-  update(id: number, input: UpdateCourseInput): Course | undefined {
-    const course = this.findOne(id);
-
-
-    if (!course) {
-      return undefined;
-    }
-
-    Object.assign(course, input);
-    return course;
+  create(dto: CreateCourseDto) { // 6
+    const course = this.coursesRepository.create(dto as DeepPartial<Course>);
+    return this.coursesRepository.save(course);
   }
-  
-  remove(id: number): Course | undefined {
-    const index = this.courses.findIndex((course) => course.id === id);
-    if (this.courses[index].isactive === 'Inactivo') {
-      throw new ConflictException('No puedes eliminar a un estudiante inacivo');
-    }
 
-    if (index === -1) {
-      return undefined;
-    }
+  async update(id: string, dto: CreateCourseDto) {
+    const course = await this.findOne(id); // 7
+    Object.assign(course, dto);
+    return this.coursesRepository.save(course); // 8
+  }
 
-    const [removedCourse] = this.courses.splice(index, 1);
-    return removedCourse;
+  async remove(id: string) {
+    const course = await this.findOne(id); // 9
+    await this.coursesRepository.remove(course); // 10
+    return course;
   }
 }
