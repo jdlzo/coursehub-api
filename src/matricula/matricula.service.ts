@@ -1,85 +1,51 @@
-import { Injectable,ConflictException,PipeTransform,ArgumentMetadata } from '@nestjs/common';
+import { Injectable, PipeTransform, ArgumentMetadata, NotFoundException } from '@nestjs/common';
 import { CreateMatriculaDto } from './dto/create-matricula.dto.js';
-type matricula ={
-        id: number;
-        studentID: string;
-        courseID: string;
-        isactive?: string;
-};
-type CreateMatriculaInput = {
-        studentID: string;
-        courseID: string;
-        isactive?: string;
-};
-type UpdateMatriculaInput = {
-        studentID?: string;
-        courseID?: string;
-        isactive?: string;
-};
+import { InjectRepository } from '@nestjs/typeorm';
+import { Enrollment } from './entities/matricula.entity.js';
+import { DeepPartial, Repository } from 'typeorm';
+
+// solo hace que el nombre se convierta en minúscula
 @Injectable()
 export class MatriculaValidationPipe implements PipeTransform {
-    transform(value: any) {
-        if (typeof value.studentID === 'string') {
-            value.studentID = value.studentID.toLowerCase();
-        }
-        return value;   
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (value.title) {
+      value.title = value.title.toLowerCase();
     }
+    return value;
+  }
 }
 
 @Injectable()
-export class MatriculaService {
-    private nextId = 4;
-    private matricula: matricula[] = [
-    { id: 1, studentID: 'oda2', courseID: '1', isactive: 'Activo'},
-    { id: 2, studentID: 'kasie5', courseID: '2', isactive: 'Activo'},
-    { id: 3, studentID: 'oas4', courseID: '3', isactive: 'Inactivo'},
-  ];
-findAll(studentID?: string): matricula[] {
-    if (!studentID) {
-      return this.matricula;
-    }
+export class MatriculasService {
+  constructor(
+    @InjectRepository(Enrollment)
+    private readonly matriculasRepository: Repository<Enrollment>,
+  ) {}
 
-    return this.matricula.filter((matricula) => matricula.studentID === studentID);
+  findAll(ID: number | undefined) {
+    return this.matriculasRepository.find();
   }
 
-
-  findOne(id: number): matricula | undefined {
-    return this.matricula.find((matricula) => matricula.id === id);
-  }
-
-  create(createMatriculaDto: CreateMatriculaDto): matricula {
-    const emailExists = this.matricula.some(matricula => matricula.studentID === createMatriculaDto.studentID);
-    if (emailExists) {
-      throw new ConflictException('El ID del estudiante ya esta en uso....');
-    }
-    const matricula = { id: this.nextId++, ...createMatriculaDto };
-    this.matricula.push(matricula);
+  async findOne(id: string): Promise<Enrollment> {
+    const matricula = await this.matriculasRepository.findOneBy({ id: Number(id) });
+    if (!matricula) throw new NotFoundException(`Matricula ${id} not found`);
     return matricula;
   }
 
-  update(id: number, input: UpdateMatriculaInput): matricula | undefined {
-    const matricula = this.findOne(id);
-
-
-    if (!matricula) {
-      return undefined;
-    }
-
-    Object.assign(matricula, input);
-    return matricula;
+  async create(dto: CreateMatriculaDto): Promise<Enrollment> {
+    const matricula = this.matriculasRepository.create(dto as DeepPartial<Enrollment>);
+    return this.matriculasRepository.save(matricula);
   }
 
-  remove(id: number): matricula | undefined {
-    const index = this.matricula.findIndex((matricula) => matricula.id === id);
-    if (this.matricula[index].isactive === 'Inactivo') {
-      throw new ConflictException('No puedes eliminar a un estudiante inacivo');
-    }
+  async update(id: string, dto: CreateMatriculaDto) {
+    const matricula = await this.findOne(id);
+    Object.assign(matricula, dto);
+    return this.matriculasRepository.save(matricula);
+  }
 
-    if (index === -1) {
-      return undefined;
-    }
-
-    const [removedMatricula] = this.matricula.splice(index, 1);
-    return removedMatricula;
+  async remove(id: string) {
+    const matricula = await this.findOne(id);
+    await this.matriculasRepository.remove(matricula);
+    return matricula;
   }
 }

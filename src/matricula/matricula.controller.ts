@@ -1,39 +1,38 @@
 import { Body, Controller,Delete, Get, Param, Patch, Post, Query  } from '@nestjs/common';
 import {CreateMatriculaDto} from './dto/create-matricula.dto.js';
-import { MatriculaService, MatriculaValidationPipe } from './matricula.service.js';
+import { MatriculasService,MatriculaValidationPipe} from './matricula.service.js';
 
-//hola
-@Controller('matricula')
-export class MatriculaController {
+@Controller('matriculas')
+export class MatriculasController {
 
-      constructor(private readonly matriculaService: MatriculaService) {}
+      constructor(private readonly matriculasService: MatriculasService) {}
     
       @Get()
-      findAll(@Query('studentID') studentID?: string) {
-        return this.matriculaService.findAll(studentID);
+      findAll(@Query('id') ID?: number) {
+        return this.matriculasService.findAll(ID);
       }
     
       @Get(':id')
       findOne(@Param('id') id: string) {
-        return this.matriculaService.findOne(Number(id));
+        return this.matriculasService.findOne(id);
       }
     
       @Post()
-      create(@Body(new MatriculaValidationPipe()) createMatriculaDto: CreateMatriculaDto) {
-      return this.matriculaService.create(createMatriculaDto);
+      create(@Body(new MatriculaValidationPipe()) matriculadto: CreateMatriculaDto) {
+        return this.matriculasService.create(matriculadto);
       }
     
       @Patch(':id')
       update(
         @Param('id') id: string,
-        @Body(new MatriculaValidationPipe()) body: { studenID?: string, couseID?:string, isactive?: string },
+    @Body(new MatriculaValidationPipe()) body: CreateMatriculaDto,
       ) {
-        return this.matriculaService.update(Number(id), body);
+        return this.matriculasService.update(id, body);
       }
     
       @Delete(':id')
       remove(@Param('id') id: string) {
-        return this.matriculaService.remove(Number(id));
+        return this.matriculasService.remove(id);
       }
     
 }

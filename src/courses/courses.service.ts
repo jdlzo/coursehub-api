@@ -33,7 +33,7 @@ export class CoursesService {
     return course;
   }
 
-  create(dto: CreateCourseDto) { // 6
+  async create(dto: CreateCourseDto): Promise<Course> {
     const course = this.coursesRepository.create(dto as DeepPartial<Course>);
     return this.coursesRepository.save(course);
   }

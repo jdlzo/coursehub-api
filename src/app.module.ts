@@ -6,14 +6,13 @@ import { WelcomeService } from './welcome.service.js';
 import { WelcomeController } from './welcome.controller.js'; 
 import { CoursesModule } from './courses/courses.module.js';
 import { MatriculaModule } from './matricula/matricula.module.js';
-import { MatriculaController } from './matricula/matricula.controller.js';
-import { MatriculaService } from './matricula/matricula.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { StudentsModule } from './students/students.module.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true , envFilePath: 'src/.env'}),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -25,10 +24,11 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         autoLoadEntities: true, synchronize: true,
       }),
     }),
-    CoursesModule
+    CoursesModule,
+    StudentsModule,
+    MatriculaModule,
   ],
-  controllers: [AppController, WelcomeController,/*MatriculaController*/],
-  providers: [AppService, WelcomeService,/*MatriculaService*/],
+  controllers: [AppController, WelcomeController],
+  providers: [AppService, WelcomeService],
 })
 export class AppModule {}
-
