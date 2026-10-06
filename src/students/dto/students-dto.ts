@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty,IsInt } from 'class-validator';
+import { IsString, IsNotEmpty,IsInt, IsBoolean } from 'class-validator';
 
 export class studentsdto {
   
@@ -23,5 +23,6 @@ export class studentsdto {
   semester: number;
 
   @IsNotEmpty()
+  @IsBoolean()
   isActive: boolean;
 }

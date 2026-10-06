@@ -7,13 +7,20 @@ export class MatriculasController {
 
       constructor(private readonly matriculasService: MatriculasService) {}
     
-      @Get()
-      findAll(@Query('id') ID?: number) {
-        return this.matriculasService.findAll(ID);
-      }
+    @Get()
+    findAll(
+      @Query('studentId') studentId?: string,
+      @Query('courseId') courseId?: string,
+    ) {
+    
+      return this.matriculasService.findAll(
+        studentId ? Number(studentId) : undefined,
+        courseId ? Number(courseId) : undefined,
+      );
+    }
     
       @Get(':id')
-      findOne(@Param('id') id: string) {
+      findOne(@Param('id') id: number) {
         return this.matriculasService.findOne(id);
       }
     
@@ -24,14 +31,14 @@ export class MatriculasController {
     
       @Patch(':id')
       update(
-        @Param('id') id: string,
+        @Param('id') id: number,
     @Body(new MatriculaValidationPipe()) body: CreateMatriculaDto,
       ) {
         return this.matriculasService.update(id, body);
       }
     
       @Delete(':id')
-      remove(@Param('id') id: string) {
+      remove(@Param('id') id: number) {
         return this.matriculasService.remove(id);
       }
     
