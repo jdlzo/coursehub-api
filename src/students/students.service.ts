@@ -9,8 +9,7 @@ export class StudentsValidationPipe{}
 
 @Injectable()
 export class StudentsService {
-  update: any;
-    remove: any;
+  remove: any
   constructor(
     @InjectRepository(Student) private readonly studentsRepository: Repository<Student>,) {}
     
@@ -26,6 +25,24 @@ export class StudentsService {
     const student = await this.studentsRepository.findOneBy({ id });
     if (!student) throw new NotFoundException(`Student ${id} not found`);
     return student;
+  }
+
+  async update(id: number, updateStudentDto: Partial<studentsdto>): Promise<Student> {
+  
+    await this.findOne(id);
+
+    if (updateStudentDto.email) {
+      await this.ensureEmailAvailable(updateStudentDto.email, id);
+    }
+    const student = await this.studentsRepository.preload({
+      id: id,...updateStudentDto,
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student ${id} not found`);
+    }
+
+    return this.studentsRepository.save(student);
   }
 
   async create(dto: studentsdto): Promise<Student> {

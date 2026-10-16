@@ -29,23 +29,50 @@ export class MatriculasService {
     private readonly coursesRepository: Repository<Course>,
   ) {}
 
-  async findAll(studentId?: number, courseId?: number): Promise<Enrollment[]> {
-    const condicionesWhere: any = {};
-    if (studentId) {
-      condicionesWhere.student = { id: studentId };
-    }
-    if (courseId) {
-      condicionesWhere.course = { id: courseId };
-    }
+  async findAll(query: any): Promise<any> {
+  const qb = this.matriculasRepository
+    .createQueryBuilder('enrollment')
+    .leftJoinAndSelect('enrollment.student', 'student')
+    .leftJoinAndSelect('enrollment.course', 'course');
 
-    return this.matriculasRepository.find({
-      where: condicionesWhere,
-      relations: {
-        student: true,
-        course: true,
-      },
+  // 1. Filtros
+  if (query.search) {
+    qb.andWhere('(student.name ILIKE :search OR course.title ILIKE :search)', {
+      search: `%${query.search.trim()}%`,
     });
   }
+  
+  if (query.studentId) {
+    qb.andWhere('student.id = :studentId', { studentId: query.studentId });
+  }
+  
+  if (query.courseId) {
+    qb.andWhere('course.id = :courseId', { courseId: query.courseId });
+  }
+  
+  if (query.activeOnly === 'true') {
+    qb.andWhere('student.isActive = :active', { active: true });
+  }
+
+  // 2. Ordenamiento y Paginación (Se aplica antes de ejecutar la consulta)
+  if (query.page && query.limit) {
+    qb.orderBy('enrollment.id', 'ASC')
+      .skip((query.page - 1) * query.limit)
+      .take(query.limit);
+  }
+
+  // 3. Ejecución y Retorno final con metadatos
+  const [items, total] = await qb.getManyAndCount();
+  
+  return { 
+    items, 
+    meta: { 
+      total, 
+      page: query.page ? Number(query.page) : 1, 
+      limit: query.limit ? Number(query.limit) : items.length 
+    } 
+  };
+}
 
   async findOne(id: number): Promise<Enrollment> {
     const matricula = await this.matriculasRepository.findOneBy({ id: Number(id) });
@@ -79,4 +106,6 @@ export class MatriculasService {
     await this.matriculasRepository.remove(matricula);
     return matricula;
   }
+
+  
 }

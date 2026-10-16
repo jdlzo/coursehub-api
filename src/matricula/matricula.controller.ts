@@ -8,16 +8,10 @@ export class MatriculasController {
       constructor(private readonly matriculasService: MatriculasService) {}
     
     @Get()
-    findAll(
-      @Query('studentId') studentId?: string,
-      @Query('courseId') courseId?: string,
-    ) {
-    
-      return this.matriculasService.findAll(
-        studentId ? Number(studentId) : undefined,
-        courseId ? Number(courseId) : undefined,
-      );
-    }
+  findAll(@Query() query: any) {
+    // Aquí pasamos 'query' como un único objeto, que es lo que espera el service
+    return this.matriculasService.findAll(query);
+  }
     
       @Get(':id')
       findOne(@Param('id') id: number) {

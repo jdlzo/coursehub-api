@@ -3,6 +3,7 @@ import { CreateCourseDto } from './dto/create-course.dto.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity.js';
 import { DeepPartial, Repository } from 'typeorm';
+import { CoursesQueryDto } from './dto/courses-query.dto.js';
 
 
 //solo hace que el nombre se convierta en minuscula
@@ -23,28 +24,44 @@ export class CoursesService {
     private readonly coursesRepository: Repository<Course>,
   ) {} // 1
 
-  findAll(level?: string) { // 2
-    return this.coursesRepository.find({ where: level ? { level } : {} }); // 3
-  }
+  async findAll(query: CoursesQueryDto) {
+  const { level, page, limit, sortBy, order } = query;
+  const [items, total] = await this.coursesRepository.findAndCount({
+    where: level ? { level } : {},
+    order: { [sortBy]: order },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
 
-  async findOne(id: string): Promise<Course> {
+  return {
+    items,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+  async findOne(id: Number): Promise<Course> {
     const course = await this.coursesRepository.findOneBy({ id: Number(id) }); // 4
     if (!course) throw new NotFoundException(`Course ${id} not found`); // 5
     return course;
   }
 
   async create(dto: CreateCourseDto): Promise<Course> {
-    const course = this.coursesRepository.create(dto as DeepPartial<Course>);
+    const course = this.coursesRepository.create(dto as unknown as DeepPartial<Course>);
     return this.coursesRepository.save(course);
   }
 
-  async update(id: string, dto: CreateCourseDto) {
+  async update(id: number, dto: CreateCourseDto) {
     const course = await this.findOne(id); // 7
     Object.assign(course, dto);
     return this.coursesRepository.save(course); // 8
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     const course = await this.findOne(id); // 9
     await this.coursesRepository.remove(course); // 10
     return course;
