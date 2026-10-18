@@ -35,7 +35,6 @@ export class MatriculasService {
     .leftJoinAndSelect('enrollment.student', 'student')
     .leftJoinAndSelect('enrollment.course', 'course');
 
-  // 1. Filtros
   if (query.search) {
     qb.andWhere('(student.name ILIKE :search OR course.title ILIKE :search)', {
       search: `%${query.search.trim()}%`,
@@ -53,15 +52,11 @@ export class MatriculasService {
   if (query.activeOnly === 'true') {
     qb.andWhere('student.isActive = :active', { active: true });
   }
-
-  // 2. Ordenamiento y Paginación (Se aplica antes de ejecutar la consulta)
   if (query.page && query.limit) {
     qb.orderBy('enrollment.id', 'ASC')
       .skip((query.page - 1) * query.limit)
       .take(query.limit);
   }
-
-  // 3. Ejecución y Retorno final con metadatos
   const [items, total] = await qb.getManyAndCount();
   
   return { 

@@ -2,7 +2,7 @@ import { IsIn, IsInt, IsNotEmpty, IsString} from 'class-validator';
 
 export class CreateCourseDto { 
   
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
   title: number;
 

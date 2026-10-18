@@ -9,10 +9,19 @@ import { MatriculaModule } from './matricula/matricula.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StudentsModule } from './students/students.module.js';
+import Joi from 'joi';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true , envFilePath: 'src/.env'}),
+    ConfigModule.forRoot({ isGlobal: true,validationSchema: Joi.object({
+        NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
+        PORT: Joi.number().port().default(3000),
+        DATABASE_HOST: Joi.string().required(),
+        DATABASE_PORT: Joi.number().port().default(5432),
+        DATABASE_NAME: Joi.string().required(),
+        DATABASE_USER: Joi.string().required(),
+        DATABASE_PASSWORD: Joi.string().allow('').required(),}),
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
