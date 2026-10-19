@@ -10,6 +10,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StudentsModule } from './students/students.module.js';
 import Joi from 'joi';
+import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 @Module({
   imports: [
@@ -40,6 +42,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     CoursesModule,
     StudentsModule,
     MatriculaModule,
+    UsersModule,
+    AuthModule
   ],
   controllers: [AppController, WelcomeController],
   providers: [AppService, WelcomeService],
