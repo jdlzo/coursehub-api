@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Course } from '../../courses/entities/course.entity.js';
 import { Student } from '../../students/entities/students.entity.js';

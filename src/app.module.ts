@@ -33,8 +33,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         database: config.getOrThrow<string>('DATABASE_NAME'),
         autoLoadEntities: true, 
         synchronize: config.getOrThrow<string>('NODE_ENV') === 'development',
+        
       }),
     }),
+    
     CoursesModule,
     StudentsModule,
     MatriculaModule,
