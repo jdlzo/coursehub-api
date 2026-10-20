@@ -9,6 +9,13 @@ export class UsersService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+  return this.usersRepository
+    .createQueryBuilder('user')
+    .addSelect('user.passwordHash')
+    .where('user.email = :email', { email })
+    .getOne();
+  }
 
   findByEmail(email: string) {
     return this.usersRepository.findOneBy({ email });
