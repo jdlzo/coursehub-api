@@ -34,5 +34,6 @@ export class StudentsController {
       remove(@Param('id') id: number) {
         return this.studentsService.remove(Number(id));
       }
+      
     
 }

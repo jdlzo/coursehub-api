@@ -1,9 +1,11 @@
-import { Injectable,ConflictException,PipeTransform,ArgumentMetadata, NotFoundException} from '@nestjs/common';
+import { Injectable,ConflictException,PipeTransform,ArgumentMetadata, NotFoundException, ForbiddenException} from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity.js';
 import { DeepPartial, Repository } from 'typeorm';
 import { CoursesQueryDto } from './dto/courses-query.dto.js';
+import { AuthenticatedUser } from '../auth/types/jwt-payload.type.js';
+import { UserRole } from '../users/user-role.enum.js';
 
 
 //solo hace que el nombre se convierta en minuscula
@@ -55,15 +57,29 @@ export class CoursesService {
     return this.coursesRepository.save(course);
   }
 
-  async update(id: number, dto: CreateCourseDto) {
+  /*async update(id: number, dto: CreateCourseDto) {
     const course = await this.findOne(id); // 7
     Object.assign(course, dto);
     return this.coursesRepository.save(course); // 8
-  }
+  }*/
 
   async remove(id: number) {
     const course = await this.findOne(id); // 9
     await this.coursesRepository.remove(course); // 10
     return course;
+  }
+  async update(id: number, dto: CreateCourseDto, actor: AuthenticatedUser) {
+  const course = await this.findOneOrFail(id);
+  const canManageAny = actor.role === UserRole.ADMIN;
+  const isOwner = course.createdByUserId === actor.id;
+
+  if (!canManageAny && !isOwner) {
+    throw new ForbiddenException('You cannot modify this course');
+  }
+  Object.assign(course, dto);
+  return this.coursesRepository.save(course);
+}
+  async findOneOrFail(id: number): Promise<Course> {
+    return this.findOne(id);
   }
 }

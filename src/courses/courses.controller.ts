@@ -4,13 +4,18 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CoursesService, CourseValidationPipe } from './courses.service.js';
 import { CreateCourseDto } from './dto/create-course.dto.js';
 import { CoursesQueryDto } from './dto/courses-query.dto.js';
+import { JwtAuthGuard, Roles } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles-guard.js';
+import { UserRole } from '../users/user-role.enum.js';
 
 @Controller('courses')
 export class CoursesController {
@@ -43,8 +48,14 @@ export class CoursesController {
     return this.coursesService.update(id, body);
   }
 
-  @Delete(':id')
+  /*@Delete(':id')
   remove(@Param('id') id: number) {
+    return this.coursesService.remove(id);
+  }*/
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.coursesService.remove(id);
   }
 }

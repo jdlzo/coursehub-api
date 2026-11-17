@@ -15,4 +15,5 @@ export class Course { // 3
     matricula: any;
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments: Relation<Enrollment[]>;
+  createdByUserId: number;
 }
