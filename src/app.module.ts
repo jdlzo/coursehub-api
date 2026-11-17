@@ -17,7 +17,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   imports: [
     ConfigModule.forRoot({ isGlobal: true,validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
-        PORT: Joi.number().port().default(3000),
+        PORT: Joi.number().port().default(4000),
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.number().port().default(5432),
         DATABASE_NAME: Joi.string().required(),

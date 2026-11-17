@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { CoursesService, CourseValidationPipe } from './courses.service.js';
@@ -42,10 +43,11 @@ export class CoursesController {
 
   @Patch(':id')
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new CourseValidationPipe()) body: CreateCourseDto,
+    @Request() req: { user: NonNullable<Parameters<CoursesService['update']>[2]> },
   ) {
-    return this.coursesService.update(id, body);
+    return this.coursesService.update(id, body, req.user);
   }
 
   /*@Delete(':id')

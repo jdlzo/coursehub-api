@@ -4,15 +4,11 @@ export class CreateCourseDto {
   
   @IsString()
   @IsNotEmpty()
-  title: number;
+  title: string;
 
   @IsString()
   @IsNotEmpty()
   @IsIn(['beginner', 'intermediate', 'advanced'])
   level: string;
-
-  @IsString()
-  @IsNotEmpty()
-  actor: string;
 
 }
