@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -13,6 +13,7 @@ import Joi from 'joi';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware.js';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 @Module({
   imports: [
@@ -54,4 +55,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   controllers: [AppController, WelcomeController],
   providers: [AppService, WelcomeService],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}
