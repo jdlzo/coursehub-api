@@ -4,11 +4,17 @@ import { ValidationPipe } from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 
 async function bootstrap() {
+  
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,});
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
   const config = app.get(ConfigService);
   const port = config.getOrThrow<number>('PORT');
+  app.enableCors({
+    origin: ['https://coursehub.example.edu'], 
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
   await app.listen(port);
 }
 await bootstrap();

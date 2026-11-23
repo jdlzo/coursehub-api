@@ -14,7 +14,8 @@ import {
 import { CoursesService, CourseValidationPipe } from './courses.service.js';
 import { CreateCourseDto } from './dto/create-course.dto.js';
 import { CoursesQueryDto } from './dto/courses-query.dto.js';
-import { JwtAuthGuard, Roles } from '../auth/guards/jwt-auth.guard.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { Roles } from '../auth/roles.decorator.js';
 import { RolesGuard } from '../auth/guards/roles-guard.js';
 import { UserRole } from '../users/user-role.enum.js';
 

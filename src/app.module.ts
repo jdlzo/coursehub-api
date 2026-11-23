@@ -12,6 +12,7 @@ import { StudentsModule } from './students/students.module.js';
 import Joi from 'joi';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { ThrottlerModule } from '@nestjs/throttler';
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 @Module({
   imports: [
@@ -46,7 +47,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     StudentsModule,
     MatriculaModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 20 }])
+
   ],
   controllers: [AppController, WelcomeController],
   providers: [AppService, WelcomeService],
