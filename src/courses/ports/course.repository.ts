@@ -1,4 +1,4 @@
-import { Course } from '../entities/course.entity.js'; // ajusta ruta/nombre si difiere
+import { Course } from '../entities/course.entity.js'; 
 
 export const COURSE_REPOSITORY = Symbol('COURSE_REPOSITORY');
 
