@@ -9,7 +9,7 @@ async function bootstrap() {
   
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,});
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   const config = app.get(ConfigService);
   const port = config.getOrThrow<number>('PORT');
   app.enableCors({

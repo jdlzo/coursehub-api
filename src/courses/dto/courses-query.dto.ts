@@ -27,5 +27,4 @@ export class CoursesQueryDto {
     @Transform(({ value }) => String(value).toUpperCase())
     @IsIn(['ASC', 'DESC'])
     order: 'ASC' | 'DESC' = 'ASC';
-  skip: number;
 }
